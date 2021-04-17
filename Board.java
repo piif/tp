@@ -4,8 +4,17 @@ class Board extends Canvas {
     public final int LINES=30;
     public final int COLUMNS=10;
     public final int BLOCK_SIZE=12;
+    public final Color COLORS[] = {
+        Color.BLACK, // none
+        Color.yellow,
+        Color.red,
+        Color.green,
+        Color.blue,
+        Color.cyan,
+        Color.orange
+    };
 
-    private int[][] blocks = new int[LINES][COLUMNS];
+    private short[][] tiles = new short[LINES][COLUMNS];
 
     private static final long serialVersionUID = 1L;
 
@@ -27,11 +36,17 @@ class Board extends Canvas {
     }
 
     public void paint(Graphics g) {  
-        block(g, 1, 1, Color.YELLOW);
-        block(g, 1, 2, Color.YELLOW);
-        block(g, 1, 3, Color.YELLOW);
-        block(g, 1, LINES, Color.GREEN);
-        block(g, COLUMNS, 1, Color.BLUE);
-        block(g, COLUMNS, LINES, Color.RED);
+        g.setColor(Color.white);
+        g.fill3DRect(0, 0, BLOCK_SIZE, getHeight()-BLOCK_SIZE, true);
+        g.fill3DRect(getWidth()-BLOCK_SIZE, 0, BLOCK_SIZE, getHeight()-BLOCK_SIZE, true);
+        g.fill3DRect(0, getHeight()-BLOCK_SIZE, getWidth(), BLOCK_SIZE, true);
+
+        for (short line = 0; line < LINES; line++) {
+            for (short col = 0; col < COLUMNS; col++) {
+                if (tiles[line][col] != 0) {
+                    block(g, col, line, COLORS[tiles[line][col]]);
+                }
+            }
+        }
     }
 }
