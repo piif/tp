@@ -12,13 +12,13 @@ class Board extends Canvas {
         Color.pink
     };
 
-    public final short lines, columns;
-    private short[][] tiles;
+    public final int lines, columns;
+    private int[][] tiles;
 
-    public Board(short lines, short columns) {
+    public Board(int lines, int columns) {
         this.lines = lines;
         this.columns = columns;
-        tiles = new short[lines][columns];
+        tiles = new int[lines][columns];
 
         setBackground (Color.DARK_GRAY);
         setSize(getWidth(), getHeight());
@@ -36,23 +36,33 @@ class Board extends Canvas {
         g.fill3DRect(col*TILE_SIZE, line*TILE_SIZE, TILE_SIZE, TILE_SIZE, true);
     }
 
-    public void drawBlock(Block block, short pos, int col, int line) {
+    public void drawBlock(Block block, int pos, int col, int line) {
+        System.out.println("drawBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
-        for (short t=0; t<4; t++) {
+        for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
             tiles[line+tile.dy][col+tile.dx] = block.color;
         }
     }
 
-    public boolean checkBlock(Block block, short pos, short col, short line) {
+    public void removeBlock(Block block, int pos, int col, int line) {
+        System.out.println("removeBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
-        for (short t=0; t<4; t++) {
+        for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
-            short l = (short)(line + tile.dy) , c = (short)(col + tile.dx);
-            if (l < 0 || l >= columns) {
+            tiles[line+tile.dy][col+tile.dx] = 0;
+        }
+    }
+
+    public boolean checkBlock(Block block, int pos, int col, int line) {
+        Block.Position position = block.positions[pos];
+        for (int t=0; t<4; t++) {
+            Block.Tile tile = position.tiles[t];
+            int l = line + tile.dy , c = col + tile.dx;
+            if (l < 0 || l >= lines) {
                 return false;
             }
-            if (c < 0 || c >= lines ) {
+            if (c < 0 || c >= columns) {
                 return false;
             }
             if (tiles[line+tile.dy][col+tile.dx] != 0) {
@@ -64,14 +74,14 @@ class Board extends Canvas {
 
     public void paint(Graphics g) {  
         g.setColor(Color.white);
-        g.fill3DRect(0, 0, TILE_SIZE, getHeight()-TILE_SIZE, true);
-        g.fill3DRect(getWidth()-TILE_SIZE, 0, TILE_SIZE, getHeight()-TILE_SIZE, true);
+        g.fill3DRect(0, TILE_SIZE, TILE_SIZE, getHeight()-2*TILE_SIZE, true);
+        g.fill3DRect(getWidth()-TILE_SIZE, TILE_SIZE, TILE_SIZE, getHeight()-2*TILE_SIZE, true);
         g.fill3DRect(0, getHeight()-TILE_SIZE, getWidth(), TILE_SIZE, true);
 
-        for (short line = 0; line < lines; line++) {
-            for (short col = 0; col < columns; col++) {
+        for (int line = 0; line < lines; line++) {
+            for (int col = 0; col < columns; col++) {
                 if (tiles[line][col] != 0) {
-                    drawTile(g, col, line, COLORS[(tiles[line][col]-1) % COLORS.length]);
+                    drawTile(g, col+1, line+1, COLORS[(tiles[line][col]-1) % COLORS.length]);
                 }
             }
         }
