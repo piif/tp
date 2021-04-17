@@ -2,6 +2,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Test {
+    public final short LINES = 30;
+    public final short COLUMNS = 20;
 
     public Test() {
         // draw main window
@@ -14,11 +16,17 @@ public class Test {
 		f.addKeyListener(listener);
 		f.setFocusable(true);
 
-        Board board = new Board();
+        Board board = new Board(LINES, COLUMNS);
         f.add(board);
 
         f.pack();
         f.setVisible(true);
+
+        for (short b=0; b< 7; b++) {
+            for (short p=0; p<4; p++) {
+                board.drawBlock(Block.blocks[b], p, 2 + 4*p, 2 + 4*b);
+            }
+        }
     }
 
 	private class MyKeyListener implements KeyListener {
