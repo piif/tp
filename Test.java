@@ -2,12 +2,17 @@ import java.awt.*;
 
 public class Test {
     public static void main(String argv[]) {
-        System.out.println("this is a test");
+        Board board = new Board();
 
+        // draw main window
         Frame f= new Frame("Canvas Example");  
-        f.add(new Board());  
-        f.setLayout(null);  
-        f.setSize(400, 400);  
+        GridBagLayout layout = new GridBagLayout();
+        f.setLayout(layout);
+
+        // TODO f.setDefaultCloseOperation()
+
+        f.add(board); 
+        f.pack(); 
         f.setVisible(true);  
     }
 }
