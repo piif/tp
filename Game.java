@@ -40,7 +40,7 @@ public class Game {
 		@Override
 		public void keyPressed(KeyEvent e) {
             String key = KeyEvent.getKeyText(e.getKeyCode());
-            System.out.println("keyPressed=" + key + "(" + e.getKeyCode() + ")");
+            // System.out.println("keyPressed=" + key + "(" + e.getKeyCode() + ")");
 
             if ("Q".equals(key)) {
                 quit();
@@ -94,7 +94,7 @@ public class Game {
     }
     private void newBlock() {
         currentBlock = Block.randomBlock();
-        System.out.println("peak block " + currentBlock);
+        // System.out.println("peak block " + currentBlock);
         currentLine = 2;
         currentColumn = COLUMNS / 2;
         currentPosition = 0;
@@ -113,6 +113,7 @@ public class Game {
     }
     private void fallDown() {
         while (moveTo(currentPosition, currentColumn, currentLine + 1));
+        checkLines();
         newBlock();
     }
     private boolean moveTo(int p, int c, int l) {
@@ -132,10 +133,25 @@ public class Game {
     }
     private void doStep() {
         if (!moveTo(currentPosition, currentColumn, currentLine + 1)) {
+            checkLines();
             newBlock();
         }
     }
-
+    void checkLines() {
+        timer.stop();
+        // check if lines "around" current block are full. If yes, delete them by moving all
+        // line on top one line down
+        for (int l = currentLine - 2; l <= currentLine + 2; l++) {
+            if (l >= LINES || l < 0) {
+                continue;
+            }
+            if (board.lineIsFull(l)) {
+                // System.out.println("line " + l + " is full");
+                board.shiftDown(l);
+            }
+        }
+        timer.restart();
+    }
     private void quit() {
         System.out.println("Quit");
         System.exit(0);

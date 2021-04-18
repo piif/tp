@@ -2,6 +2,7 @@
 tetris draft
 
 TODO :
-- moveDown thru timer
-- check lines
-- space to send block down
+- handle and display score
+- add buttons (start, quit, pause)
+- preview next block
+- ...

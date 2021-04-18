@@ -3,6 +3,7 @@ import java.awt.*;
 class Board extends Canvas {
     public final int TILE_SIZE=12;
     public final Color COLORS[] = {
+        Color.darkGray,
         Color.yellow,
         Color.red,
         Color.green,
@@ -37,7 +38,7 @@ class Board extends Canvas {
     }
 
     public void drawBlock(Block block, int pos, int col, int line) {
-        System.out.println("drawBlock "+pos+", "+col+", "+line);
+        // System.out.println("drawBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
         for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
@@ -46,7 +47,7 @@ class Board extends Canvas {
     }
 
     public void removeBlock(Block block, int pos, int col, int line) {
-        System.out.println("removeBlock "+pos+", "+col+", "+line);
+        // System.out.println("removeBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
         for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
@@ -72,6 +73,22 @@ class Board extends Canvas {
         return true;
     }
 
+    public boolean lineIsFull(int line) {
+        for (int c = 0; c < columns ; c++) {
+            if (tiles[line][c] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void shiftDown(int line) {
+        if (line > 0) {
+            System.arraycopy(tiles, 0, tiles, 1, line);
+        }
+        tiles[0] = new int[columns];
+    }
+
     public void paint(Graphics g) {  
         g.setColor(Color.white);
         g.fill3DRect(0, TILE_SIZE, TILE_SIZE, getHeight()-2*TILE_SIZE, true);
@@ -80,8 +97,9 @@ class Board extends Canvas {
 
         for (int line = 0; line < lines; line++) {
             for (int col = 0; col < columns; col++) {
+                // remove "if" to display dark blocks, but implies flickering
                 if (tiles[line][col] != 0) {
-                    drawTile(g, col+1, line+1, COLORS[(tiles[line][col]-1) % COLORS.length]);
+                    drawTile(g, col+1, line+1, COLORS[(tiles[line][col]) % COLORS.length]);
                 }
             }
         }
