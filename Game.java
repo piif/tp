@@ -6,7 +6,8 @@ public class Game {
     public final int LINES = 35;
     public final int COLUMNS = 12;
 
-    char status = 'i'; // i = init , r = running , e = end
+    // i = init , r = running , e = end
+    char status = 'i';
     Board board = null;
     Timer timer = null;
     Block currentBlock = null;
@@ -61,10 +62,10 @@ public class Game {
                             move(+1);
                         break;
                         case "Up":
-                            rotate(1);
+                            rotate();
                         break;
                         case "Down":
-                            moveDown();
+                            fallDown();
                         break;
                     }
                 break;
@@ -85,6 +86,12 @@ public class Game {
         timer.start();
         status = 'r';
     }
+    private void stop() {
+        System.out.println("Gameover");
+        timer.stop();
+        timer = null;
+        status = 'e';
+    }
     private void newBlock() {
         currentBlock = Block.randomBlock();
         System.out.println("peak block " + currentBlock);
@@ -95,20 +102,18 @@ public class Game {
             board.drawBlock(currentBlock, currentPosition, currentColumn, currentLine);
             board.repaint();
         } else {
-            System.out.println("Gameover");
-            status = 'e';
+            stop();
         }
     }
     private void move(int direction) {
         moveTo(currentPosition, currentColumn + direction, currentLine);
     }
-    private void rotate(int direction) {
-        moveTo((currentPosition + 4 + direction) % 4, currentColumn, currentLine);
+    private void rotate() {
+        moveTo((currentPosition + 1) % 4, currentColumn, currentLine);
     }
-    private void moveDown() {
-        if (!moveTo(currentPosition, currentColumn, currentLine + 1)) {
-            newBlock();
-        }
+    private void fallDown() {
+        while (moveTo(currentPosition, currentColumn, currentLine + 1));
+        newBlock();
     }
     private boolean moveTo(int p, int c, int l) {
         board.removeBlock(currentBlock, currentPosition, currentColumn, currentLine);
@@ -126,7 +131,9 @@ public class Game {
         return result;
     }
     private void doStep() {
-        // System.out.println("tick");
+        if (!moveTo(currentPosition, currentColumn, currentLine + 1)) {
+            newBlock();
+        }
     }
 
     private void quit() {
@@ -135,6 +142,6 @@ public class Game {
     }
 
     public static void main(String argv[]) {
-        Game game = new Game();
+        /* Game game =*/ new Game();
     }
 }
