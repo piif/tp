@@ -1,7 +1,7 @@
 import java.awt.*;  
 
 class Board extends Canvas {
-    public final int TILE_SIZE=12;
+    public final int TILE_SIZE=18;
     public final Color COLORS[] = {
         Color.darkGray,
         Color.yellow,

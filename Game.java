@@ -3,7 +3,7 @@ import java.awt.event.*;
 import javax.swing.Timer;
 
 public class Game {
-    public final int LINES = 35;
+    public final int LINES = 30;
     public final int COLUMNS = 12;
 
     // i = init , r = running , e = end
