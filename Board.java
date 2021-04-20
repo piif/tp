@@ -37,6 +37,14 @@ class Board extends Canvas {
         g.fill3DRect(col*TILE_SIZE, line*TILE_SIZE, TILE_SIZE, TILE_SIZE, true);
     }
 
+    public void setTile(int col, int line, int color) {
+        tiles[line][col] = color;
+    }
+
+    public int getTile(int col, int line) {
+        return tiles[line][col];
+    }
+
     public void drawBlock(Block block, int pos, int col, int line) {
         // System.out.println("drawBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
