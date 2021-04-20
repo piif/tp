@@ -109,7 +109,7 @@ public class Game {
         moveTo(currentPosition, currentColumn + direction, currentLine);
     }
     private void rotate() {
-        moveTo((currentPosition + 1) % 4, currentColumn, currentLine);
+        moveTo((currentPosition + 1) % Block.POSITIONS_PER_BLOCK, currentColumn, currentLine);
     }
     private void fallDown() {
         while (moveTo(currentPosition, currentColumn, currentLine + 1));

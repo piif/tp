@@ -2,16 +2,98 @@ import java.awt.*;
 
 class Board extends Canvas {
     public final int TILE_SIZE=18;
-    public final Color COLORS[] = {
-        Color.darkGray,
+    static public final Color COLORS[] = {
+        null,
         Color.yellow,
         Color.red,
         Color.green,
         Color.blue,
         Color.cyan,
         Color.orange,
-        Color.pink
+        Color.pink,
+        Color.magenta,
+        Color.lightGray,
+        Color.green
     };
+    private HexagonHelper hexagonHelper;
+
+    private class HexagonHelper {
+        final int xDelta[] = { 0, 11, 15, 11,  0, -4};
+        final int yDelta[] = { 0,  0,  9, 18, 18,  9};
+
+        int[] xBorders  = new int[2*lines+3], yBorders  = new int[2*lines+3];
+
+        HexagonHelper(int lines, int columns) {
+            int rightDelta = 4*lines + 2*columns - 1;
+            int rightZero = 15 * columns + 6;
+            xBorders  = new int[rightDelta + 6];
+            yBorders  = new int[rightDelta + 6];
+
+            for (int i = 0; i < lines; i++) {
+                // left zigzag
+                xBorders[i*2] = 10;
+                yBorders[i*2] = i*18;
+                xBorders[i*2 + 1] = 6;
+                yBorders[i*2 + 1] = i*18 + 9;
+                // right zigzag
+                xBorders[rightDelta - i*2] = rightZero;
+                yBorders[rightDelta - i*2] = i*18 + 9;
+                xBorders[rightDelta - i*2 - 1] = rightZero + 4;
+                yBorders[rightDelta - i*2 - 1] = i*18 + 18;
+            }
+            // bottom line
+            int y = lines*18;
+            for (int i=2*lines, x = 10; i < 2*(lines+columns); i+=4, x+=30) {
+                xBorders[i] = x;
+                yBorders[i] = y;
+                xBorders[i + 1] = x+11;
+                yBorders[i + 1] = y;
+                xBorders[i + 2] = x+11+4;
+                yBorders[i + 2] = y+9;
+                xBorders[i + 3] = x+11+4+11;
+                yBorders[i + 3] = y+9;
+            }
+
+            // outline lines
+            xBorders[rightDelta + 1] = rightZero;
+            yBorders[rightDelta + 1] = 0;
+            xBorders[rightDelta + 2] = rightZero+10;
+            yBorders[rightDelta + 2] = 0;
+            xBorders[rightDelta + 3] = rightZero+10;
+            yBorders[rightDelta + 3] = lines*18 + 10;
+            xBorders[rightDelta + 4] = 0;
+            yBorders[rightDelta + 4] = lines*18 + 10;
+            xBorders[rightDelta + 5] = 0;
+            yBorders[rightDelta + 5] = 0;
+        }
+
+        void draw(Graphics g, int c, int l, Color color) {
+            int x, y;
+            if (c % 2 == 0) {
+                x = c * 15 + 10;
+                y = l * 18;
+            } else {
+                x = (c-1) * 15 + 25;
+                y = l * 18 + 9;
+            }
+            int[] xPoints = new int[6], yPoints = new int[6];
+            for (int i = 0; i < 6; i++) {
+                xPoints[i] = x+xDelta[i];
+                yPoints[i] = y+yDelta[i];
+            }
+            if (color != null) {
+                g.setColor(color);
+                g.fillPolygon(xPoints, yPoints, 6);
+            }
+            g.setColor(Color.gray);
+            g.drawPolygon(xPoints, yPoints, 6);
+        }
+
+        void drawBorders(Graphics g) {
+            g.setColor(Color.white);
+            g.fillPolygon(xBorders, yBorders, xBorders.length);
+        }
+    }
 
     public final int lines, columns;
     private int[][] tiles;
@@ -20,21 +102,17 @@ class Board extends Canvas {
         this.lines = lines;
         this.columns = columns;
         tiles = new int[lines][columns];
+        hexagonHelper = new HexagonHelper(lines, columns);
 
         setBackground (Color.DARK_GRAY);
         setSize(getWidth(), getHeight());
     }
 
     public int getWidth() {
-        return TILE_SIZE * (columns + 2);
+        return 30 * columns/2 + 21;
     }
     public int getHeight() {
-        return TILE_SIZE * (lines + 2);
-    }
-    
-    private void drawTile(Graphics g, int col, int line, Color color) {
-        g.setColor(color);
-        g.fill3DRect(col*TILE_SIZE, line*TILE_SIZE, TILE_SIZE, TILE_SIZE, true);
+        return lines*18 + 10;
     }
 
     public void setTile(int col, int line, int color) {
@@ -98,16 +176,13 @@ class Board extends Canvas {
     }
 
     public void paint(Graphics g) {  
-        g.setColor(Color.white);
-        g.fill3DRect(0, TILE_SIZE, TILE_SIZE, getHeight()-2*TILE_SIZE, true);
-        g.fill3DRect(getWidth()-TILE_SIZE, TILE_SIZE, TILE_SIZE, getHeight()-2*TILE_SIZE, true);
-        g.fill3DRect(0, getHeight()-TILE_SIZE, getWidth(), TILE_SIZE, true);
+        hexagonHelper.drawBorders(g);
 
         for (int line = 0; line < lines; line++) {
             for (int col = 0; col < columns; col++) {
                 // remove "if" to display dark blocks, but implies flickering
                 if (tiles[line][col] != 0) {
-                    drawTile(g, col+1, line+1, COLORS[(tiles[line][col]) % COLORS.length]);
+                    hexagonHelper.draw(g, col, line, Board.COLORS[tiles[line][col] % Board.COLORS.length]);
                 }
             }
         }

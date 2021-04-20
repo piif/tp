@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Test {
-    public final int LINES = 30;
+    public final int LINES = 20;
     public final int COLUMNS = 12;
 
     Board board = null;
@@ -52,11 +52,16 @@ public class Test {
                 case "C":
                     // clear all
                     clearAll();
+                    under = 0;
                 break;
                 case "Space":
                     // set block
-                    board.setTile(currentColumn, currentLine, 2);
-                    under = 2;
+                    if (under == 2) {
+                        under = 0;
+                    } else {
+                        under = 2;
+                    }
+                    board.setTile(currentColumn, currentLine, under);
                     board.repaint();            
                 break;
                 case "X":
@@ -84,6 +89,7 @@ public class Test {
 
     private void dump() {
         boolean first = true;
+        System.out.print("{ ");
         for (int l = 0; l < LINES; l++) {
             for (int c = 0; c < COLUMNS; c++) {
                 int color = board.getTile(c, l);
@@ -94,11 +100,11 @@ public class Test {
                         System.out.print(", ");
                     }
                     int dc = c - currentColumn, dl = l - currentLine;
-                    System.out.print("{ " + dc + ", " + dl + " }");
+                    System.out.print("{ " + (dc >= 0 ? " " : "") + dc + ", " + (dl >= 0 ? " " : "") + dl + " }");
                 }
             }
         }
-        System.out.println();
+        System.out.println(" },");
     }
 
     private boolean move(int dx, int dy) {
