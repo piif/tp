@@ -68,7 +68,7 @@ class Board extends Canvas {
             yBorders[rightDelta + 5] = 0;
         }
 
-        void draw(Graphics g, int c, int l, Color color) {
+        void draw(Graphics g, int c, int l, int color) {
             int x, y;
             if (c % 2 == 0) {
                 x = c * 15 + 10;
@@ -82,8 +82,8 @@ class Board extends Canvas {
                 xPoints[i] = x+xDelta[i];
                 yPoints[i] = y+yDelta[i];
             }
-            if (color != null) {
-                g.setColor(color);
+            if (color != -1) {
+                g.setColor(Board.COLORS[color % Board.COLORS.length]);
                 g.fillPolygon(xPoints, yPoints, 6);
             }
             g.setColor(Color.gray);
@@ -124,7 +124,7 @@ class Board extends Canvas {
         return tiles[line][col];
     }
 
-    public void drawBlock(Block block, int pos, int col, int line) {
+    private void drawBlock(Block block, int pos, int col, int line, int color) {
         // System.out.println("drawBlock "+pos+", "+col+", "+line);
         Block.Position position = block.positions[pos];
         for (int t=0; t<4; t++) {
@@ -133,21 +133,17 @@ class Board extends Canvas {
             if (col % 2 == 1 && c % 2 == 0) {
                 l++;
             }
-            tiles[l][c] = block.color;
+            tiles[l][c] = color;
         }
     }
-
+    public void drawBlock(Block block, int pos, int col, int line) {
+        drawBlock(block, pos, col, line, block.color);
+    }
+    public void drawGhost(Block block, int pos, int col, int line) {
+        drawBlock(block, pos, col, line, -1);
+    }
     public void removeBlock(Block block, int pos, int col, int line) {
-        // System.out.println("removeBlock "+pos+", "+col+", "+line);
-        Block.Position position = block.positions[pos];
-        for (int t=0; t<4; t++) {
-            Block.Tile tile = position.tiles[t];
-            int l = line+tile.dy , c = col+tile.dx;
-            if (col % 2 == 1 && c % 2 == 0) {
-                l++;
-            }
-            tiles[l][c] = 0;
-        }
+        drawBlock(block, pos, col, line, 0);
     }
 
     public boolean checkBlock(Block block, int pos, int col, int line) {
@@ -164,7 +160,7 @@ class Board extends Canvas {
             if (c < 0 || c >= columns) {
                 return false;
             }
-            if (tiles[line+tile.dy][col+tile.dx] != 0) {
+            if (tiles[l][c] != 0) {
                 return false;
             }
         }
@@ -213,7 +209,7 @@ class Board extends Canvas {
             for (int col = 0; col < columns; col++) {
                 // remove "if" to display dark blocks, but implies flickering
                 if (tiles[line][col] != 0) {
-                    hexagonHelper.draw(g, col, line, Board.COLORS[tiles[line][col] % Board.COLORS.length]);
+                    hexagonHelper.draw(g, col, line, tiles[line][col]);
                 }
             }
         }

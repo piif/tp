@@ -11,7 +11,7 @@ public class Game {
     Board board = null;
     Timer timer = null;
     Block currentBlock = null;
-    int currentLine, currentColumn, currentPosition;
+    int currentLine, currentColumn, currentPosition, ghostLine;
 
     public Game() {
         // draw main window
@@ -19,8 +19,8 @@ public class Game {
         GridBagLayout layout = new GridBagLayout();
         f.setLayout(layout);
 
-		KeyListener listener = new MyKeyListener();
-		f.addKeyListener(listener);
+        KeyListener listener = new MyKeyListener();
+        f.addKeyListener(listener);
 		f.setFocusable(true);
 
         board = new Board(LINES, COLUMNS);
@@ -95,13 +95,9 @@ public class Game {
     private void newBlock() {
         currentBlock = Block.randomBlock();
         // System.out.println("peak block " + currentBlock);
-        currentLine = 2;
-        currentColumn = COLUMNS / 2;
-        currentPosition = 0;
-        if (board.checkBlock(currentBlock, currentPosition, currentColumn, currentLine)) {
-            board.drawBlock(currentBlock, currentPosition, currentColumn, currentLine);
-            board.repaint();
-        } else {
+        currentLine = -1;
+        ghostLine = -1;
+        if (!moveTo(0, COLUMNS / 2, 2)) {
             stop();
         }
     }
@@ -112,25 +108,44 @@ public class Game {
         moveTo((currentPosition + 1) % Block.POSITIONS_PER_BLOCK, currentColumn, currentLine);
     }
     private void fallDown() {
-        while (moveTo(currentPosition, currentColumn, currentLine + 1));
+        moveTo(currentPosition, currentColumn, ghostLine);
         checkLines();
         newBlock();
     }
     private boolean moveTo(int p, int c, int l) {
-        board.removeBlock(currentBlock, currentPosition, currentColumn, currentLine);
+        if (currentLine != -1) {
+            board.removeBlock(currentBlock, currentPosition, currentColumn, currentLine);
+        }
+        if (ghostLine != currentLine) {
+            board.removeBlock(currentBlock, currentPosition, currentColumn, ghostLine);
+        }
+
         boolean result;
         if (board.checkBlock(currentBlock, p, c, l)) {
             currentPosition = p;
             currentColumn = c;
             currentLine = l;
+
+            ghostLine = currentLine;
+            while (board.checkBlock(currentBlock, currentPosition, currentColumn, ghostLine+1)) {
+                ghostLine++;
+            }
+            if (ghostLine!=currentLine) {
+                board.drawGhost(currentBlock, currentPosition, currentColumn, ghostLine);
+            }
+
             result = true;
         } else {
             result = false;
         }
-        board.drawBlock(currentBlock, currentPosition, currentColumn, currentLine);
+
+        if (currentLine != -1) {
+            board.drawBlock(currentBlock, currentPosition, currentColumn, currentLine);
+        }
         board.repaint();
         return result;
     }
+
     private void doStep() {
         if (!moveTo(currentPosition, currentColumn, currentLine + 1)) {
             checkLines();
