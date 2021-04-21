@@ -16,78 +16,72 @@ class Board extends Canvas {
         Color.green,
         Color.white
     };
-    private HexagonHelper hexagonHelper;
+    private TriangleHelper triangleHelper;
 
-    private class HexagonHelper {
-        final int xDelta[] = { 0, 11, 15, 11,  0, -4};
-        final int yDelta[] = { 0,  0,  9, 18, 18,  9};
+    private class TriangleHelper {
+        final int xDelta[] = { 0, 10, -10 };
+        final int yDelta[] = { 0, 18,  18 };
 
         int[] xBorders  = new int[2*lines+3], yBorders  = new int[2*lines+3];
 
-        HexagonHelper(int lines, int columns) {
-            int rightDelta = 4*lines + 2*columns - 1;
-            int rightZero = 15 * columns + 6;
+        TriangleHelper(int lines, int columns) {
+            int rightDelta = 2*lines + 2 - 1;
+            int rightZero = 10 + 11 * columns + 11;
             xBorders  = new int[rightDelta + 6];
             yBorders  = new int[rightDelta + 6];
 
-            for (int i = 0; i < lines; i++) {
+            for (int i = 0; i < lines; i += 2) {
                 // left zigzag
-                xBorders[i*2] = 10;
-                yBorders[i*2] = i*18;
-                xBorders[i*2 + 1] = 6;
-                yBorders[i*2 + 1] = i*18 + 9;
+                xBorders[i] = 10 + 11;
+                yBorders[i] = i*18;
+                xBorders[i + 1] = 10;
+                yBorders[i + 1] = (i+1)*18;
                 // right zigzag
-                xBorders[rightDelta - i*2] = rightZero;
-                yBorders[rightDelta - i*2] = i*18 + 9;
-                xBorders[rightDelta - i*2 - 1] = rightZero + 4;
-                yBorders[rightDelta - i*2 - 1] = i*18 + 18;
+                xBorders[rightDelta - i] = rightZero;
+                yBorders[rightDelta - i] = i*18;
+                xBorders[rightDelta - i - 1] = rightZero - 11;
+                yBorders[rightDelta - i - 1] = (i+1)*18;
             }
             // bottom line
-            int y = lines*18;
-            for (int i=2*lines, x = 10; i < 2*(lines+columns); i+=4, x+=30) {
-                xBorders[i] = x;
-                yBorders[i] = y;
-                xBorders[i + 1] = x+11;
-                yBorders[i + 1] = y;
-                xBorders[i + 2] = x+11+4;
-                yBorders[i + 2] = y+9;
-                xBorders[i + 3] = x+11+4+11;
-                yBorders[i + 3] = y+9;
-            }
+            xBorders[lines] = 10 + 11;
+            yBorders[lines] = lines*18;
+            xBorders[lines + 1] = rightZero;
+            yBorders[lines + 1] = lines*18;
 
             // outline lines
-            xBorders[rightDelta + 1] = rightZero;
+            xBorders[rightDelta + 1] = rightZero + 10;
             yBorders[rightDelta + 1] = 0;
-            xBorders[rightDelta + 2] = rightZero+10;
-            yBorders[rightDelta + 2] = 0;
-            xBorders[rightDelta + 3] = rightZero+10;
+            xBorders[rightDelta + 2] = rightZero + 10;
+            yBorders[rightDelta + 2] = lines*18 + 10;
+            xBorders[rightDelta + 3] = 0;
             yBorders[rightDelta + 3] = lines*18 + 10;
             xBorders[rightDelta + 4] = 0;
-            yBorders[rightDelta + 4] = lines*18 + 10;
-            xBorders[rightDelta + 5] = 0;
-            yBorders[rightDelta + 5] = 0;
+            yBorders[rightDelta + 4] = 0;
         }
 
         void draw(Graphics g, int c, int l, int color) {
             int x, y;
-            if (c % 2 == 0) {
-                x = c * 15 + 10;
+            int[] xPoints = new int[3], yPoints = new int[3];
+            x = c * 11 + 10 + 10;
+            if (l % 2 == c % 2) {
                 y = l * 18;
+                for (int i = 0; i < 3; i++) {
+                    xPoints[i] = x + xDelta[i];
+                    yPoints[i] = y + yDelta[i];
+                }
             } else {
-                x = (c-1) * 15 + 25;
-                y = l * 18 + 9;
-            }
-            int[] xPoints = new int[6], yPoints = new int[6];
-            for (int i = 0; i < 6; i++) {
-                xPoints[i] = x+xDelta[i];
-                yPoints[i] = y+yDelta[i];
+                y = l * 18 + 18;
+                for (int i = 0; i < 3; i++) {
+                    xPoints[i] = x - xDelta[i];
+                    yPoints[i] = y - yDelta[i];
+                }
             }
             if (color != -1) {
                 g.setColor(Board.COLORS[color % Board.COLORS.length]);
-                g.fillPolygon(xPoints, yPoints, 6);
+                g.fillPolygon(xPoints, yPoints, 3);
             }
             g.setColor(Color.gray);
-            g.drawPolygon(xPoints, yPoints, 6);
+            g.drawPolygon(xPoints, yPoints, 3);
         }
 
         void drawBorders(Graphics g) {
@@ -103,17 +97,17 @@ class Board extends Canvas {
         this.lines = lines;
         this.columns = columns;
         tiles = new int[lines][columns];
-        hexagonHelper = new HexagonHelper(lines, columns);
+        triangleHelper = new TriangleHelper(lines, columns);
 
         setBackground(Color.DARK_GRAY);
         setSize(getWidth(), getHeight());
     }
 
     public int getWidth() {
-        return 30 * columns/2 + 21;
+        return 11 * columns + 11 + 20;
     }
     public int getHeight() {
-        return lines*18 + 10;
+        return lines*19 + 10;
     }
 
     public void setTile(int col, int line, int color) {
@@ -203,13 +197,13 @@ class Board extends Canvas {
     }
 
     public void paint(Graphics g) {  
-        hexagonHelper.drawBorders(g);
+        triangleHelper.drawBorders(g);
 
         for (int line = 0; line < lines; line++) {
             for (int col = 0; col < columns; col++) {
                 // remove "if" to display dark blocks, but implies flickering
                 if (tiles[line][col] != 0) {
-                    hexagonHelper.draw(g, col, line, tiles[line][col]);
+                    triangleHelper.draw(g, col, line, tiles[line][col]);
                 }
             }
         }

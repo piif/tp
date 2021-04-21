@@ -21,7 +21,7 @@ public class TestLines {
         board = new Board(LINES, COLUMNS);
         for (int l = 0; l < LINES; l++) {
             for (int c = 0; c < COLUMNS; c++) {
-                board.setTile(c, l, l+5 % 10 + 1);
+                board.setTile(c, l, l % 10 + 1);
             }
         }
         f.add(board);
