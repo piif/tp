@@ -1,7 +1,7 @@
 import java.awt.*;  
 import java.awt.event.*;
 
-public class Test {
+public class Draw {
     public final int LINES = 20;
     public final int COLUMNS = 12;
 
@@ -9,7 +9,7 @@ public class Test {
     int currentLine = 3, currentColumn = COLUMNS / 2;
     int under = 0;
 
-    public Test() {
+    public Draw() {
         // draw main window
         Frame f= new Frame("Canvas Example");  
         GridBagLayout layout = new GridBagLayout();
@@ -124,6 +124,6 @@ public class Test {
     }
 
     public static void main(String argv[]) {
-        new Test();
+        new Draw();
     }
 }

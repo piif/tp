@@ -13,7 +13,8 @@ class Board extends Canvas {
         Color.pink,
         Color.magenta,
         Color.lightGray,
-        Color.green
+        Color.green,
+        Color.white
     };
     private HexagonHelper hexagonHelper;
 
@@ -104,7 +105,7 @@ class Board extends Canvas {
         tiles = new int[lines][columns];
         hexagonHelper = new HexagonHelper(lines, columns);
 
-        setBackground (Color.DARK_GRAY);
+        setBackground(Color.DARK_GRAY);
         setSize(getWidth(), getHeight());
     }
 
@@ -128,7 +129,11 @@ class Board extends Canvas {
         Block.Position position = block.positions[pos];
         for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
-            tiles[line+tile.dy][col+tile.dx] = block.color;
+            int l = line+tile.dy , c = col+tile.dx;
+            if (col % 2 == 1 && c % 2 == 0) {
+                l++;
+            }
+            tiles[l][c] = block.color;
         }
     }
 
@@ -137,7 +142,11 @@ class Board extends Canvas {
         Block.Position position = block.positions[pos];
         for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
-            tiles[line+tile.dy][col+tile.dx] = 0;
+            int l = line+tile.dy , c = col+tile.dx;
+            if (col % 2 == 1 && c % 2 == 0) {
+                l++;
+            }
+            tiles[l][c] = 0;
         }
     }
 
@@ -146,6 +155,9 @@ class Board extends Canvas {
         for (int t=0; t<4; t++) {
             Block.Tile tile = position.tiles[t];
             int l = line + tile.dy , c = col + tile.dx;
+            if (col % 2 == 1 && c % 2 == 0) {
+                l++;
+            }
             if (l < 0 || l >= lines) {
                 return false;
             }
@@ -170,6 +182,25 @@ class Board extends Canvas {
 
     public void shiftDown(int line) {
         if (line > 0) {
+            System.arraycopy(tiles, 0, tiles, 1, line);
+        }
+        tiles[0] = new int[columns];
+    }
+
+    public boolean halfLineIsFull(int line) {
+        for (int c = 0; c < columns ; c++) {
+            if (tiles[line - (c%2)][c] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void shiftDownHalf(int line) {
+        if (line > 0) {
+            for (int c = 1; c < columns ; c+=2) {
+                tiles[line - 1][c] = tiles[line][c];
+            }
             System.arraycopy(tiles, 0, tiles, 1, line);
         }
         tiles[0] = new int[columns];

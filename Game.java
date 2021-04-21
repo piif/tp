@@ -15,7 +15,7 @@ public class Game {
 
     public Game() {
         // draw main window
-        Frame f= new Frame("Canvas Example");  
+        Frame f= new Frame("Canvas");  
         GridBagLayout layout = new GridBagLayout();
         f.setLayout(layout);
 
@@ -139,8 +139,8 @@ public class Game {
     }
     void checkLines() {
         timer.stop();
-        // check if lines "around" current block are full. If yes, delete them by moving all
-        // line on top one line down
+        // check if lines "around" current block are full. If yes, delete them by moving
+        // one line down all line on top of it
         for (int l = currentLine - 2; l <= currentLine + 2; l++) {
             if (l >= LINES || l < 0) {
                 continue;
@@ -148,6 +148,10 @@ public class Game {
             if (board.lineIsFull(l)) {
                 // System.out.println("line " + l + " is full");
                 board.shiftDown(l);
+            }
+            if (board.halfLineIsFull(l)) {
+                // System.out.println("half line " + l + " is full");
+                board.shiftDownHalf(l);
             }
         }
         timer.restart();
